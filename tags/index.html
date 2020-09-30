@@ -655,46 +655,38 @@
 
 
 
-  
-  
-<script src="/js/valine.js"></script>
+  <script>
+  const disqus_shortname = 'ttqtc';
+  const autoload = 'false';
+  const global_url = 'http://example.com';  //  must use an absolute URL; relative URLs won’t work.
 
 
-<script>
-  var GUEST_INFO = ['nick', 'mail', 'link'];
-  var meta = 'nick,mail,link'.split(',').filter(function (item) {
-    return GUEST_INFO.indexOf(item) > -1
-  });
-  var REQUIRED_FIELDS = ['nick', 'mail', 'link'];
-  var requiredFields = 'nick,mail'.split(',').filter(function (item) {
-    return REQUIRED_FIELDS.indexOf(item) > -1
-  });
-
-  function emoji(path, idx, ext) {
-    return path + "/" + path + "-" + idx + "." + ext;
+  function checkDisqus() {
+    // 正在检查 Disqus 能否访问...
+    const runcheck = (domain) => {
+        return new Promise((resolve, reject) => {
+            const img = new Image;
+            const timeout = setTimeout(() => {
+                img.onerror = img.onload = null;
+                reject();
+            }, 3000);
+            img.onerror = () => {
+                clearTimeout(timeout);
+                reject();
+            }
+            img.onload = () => {
+                clearTimeout(timeout);
+                resolve();
+            }
+            img.src = `https://${domain}/favicon.ico?${+(new Date)}=${+(new Date)}`;
+        })
+    }
+    return Promise.all([
+        runcheck('ttqtc.disqus.com')
+    ]).then(loadDisqus,showError);
   }
 
-  var emojiMaps = {};
-  for (var i = 1; i <= 54; i++) {
-    emojiMaps['tieba-' + i] = emoji('tieba', i, 'png');
-  }
-  for (var i = 1; i <= 101; i++) {
-    emojiMaps['qq-' + i] = emoji('qq', i, 'gif');
-  }
-  for (var i = 1; i <= 116; i++) {
-    emojiMaps['aru-' + i] = emoji('aru', i, 'gif');
-  }
-  for (var i = 1; i <= 125; i++) {
-    emojiMaps['twemoji-' + i] = emoji('twemoji', i, 'png');
-  }
-  for (var i = 1; i <= 4; i++) {
-    emojiMaps['weibo-' + i] = emoji('weibo', i, 'png');
-  }
-
-  function pjax_valine() {
-    if(!document.querySelectorAll("#valine_container")[0])return;
-
-    let pagePlaceholder = $.trim($('#pjax-comment-placeholder').text()) || "快来评论吧~";
+  function loadDisqus() {
 
     let path = $.trim($('#pjax-comment-path').text());
     if (path.length == 0) {
@@ -702,31 +694,59 @@
       path = defaultPath || decodeURI(window.location.pathname);
     }
 
-    var valine = new Valine();
-    valine.init({
-      el: '#valine_container',
-      meta: meta,
-      placeholder: pagePlaceholder,
-      path: path,
-      appId: "",
-      appKey: "",
-      pageSize: '10',
-      avatar: 'robohash',
-      lang: 'zh-cn',
-      visitor: 'true',
-      highlight: 'true',
-      mathJax: 'false',
-      enableQQ: 'true',
-      recordIP: 'false',
-      requiredFields: requiredFields,
-      emojiCDN: 'https://cdn.jsdelivr.net/gh/volantis-x/cdn-emoji/valine/',
-      emojiMaps: emojiMaps
-    })
+    if (window.DISQUS) {
+      window.DISQUS.reset({
+          reload: true,
+          config() {
+            this.page.identifier = global_url + path;
+            this.page.url = global_url + path;
+          }
+      });
+    } else {
+        window.disqus_config = function () {
+          this.page.url = global_url + path;
+          this.page.identifier = global_url + path;
+        };
+        let d = document, s = d.createElement('script');
+        s.async = true;
+        s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    }
   }
 
-  $(function () {
-    pjax_valine();
-  });
+  // 加载错误
+  function showError() {
+    $('#loading-comments').hide();
+    $('#notShowDisqus').show();
+  }
+
+  // 点击了加载
+  function needLoadDisqus() {
+    checkDisqus();
+    $('#load-btns').hide();
+    $('#loading-comments').show();
+  }
+
+  // pjax 重载
+  function pjax_disqus() {
+    // 排除当前页面不存在评论框的情形
+    if ($('#disqus_thread').length == 0) {return}
+    // 如果 DISQUS 已被实例化，则可直接加载
+    if (window.DISQUS) {
+      $('#load-btns').hide();
+      $('#notShowDisqus').hide();
+      $('#loading-comments').hide();
+      loadDisqus();
+    } else if (autoload == 'true') {
+      // 设置自动加载但是上个页面加载失败了
+      needLoadDisqus();
+    }
+  }
+  if (autoload == 'true') {
+    needLoadDisqus();
+  }
+
 </script>
 
 
@@ -1104,10 +1124,10 @@ const ROOT =  ("/" || "/").endsWith('/') ? ("/" || "/") : ("//" || "/" );
         
         
         
-          pjax_valine();
         
         
         
+          pjax_disqus();
         
         
       } catch (e) {
