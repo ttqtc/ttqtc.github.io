@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            font-family: 'Oblique', Arial, sans-serif;
+        }
+
+        #love-text {
+            font-size: 12em;
+            color: white;
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out;
+        }
+
+        #gradient-canvas {
+            width: 110%;
+            height: 110%;
+            --gradient-color-1: #c3e4ff;
+            --gradient-color-2: #6ec3f4;
+            --gradient-color-3: #eae2ff;
+            --gradient-color-4: #b9beff;
+            z-index: -1;
+            position: absolute;
+            filter: blur(10px);
+        }
+
+        @font-face {
+            font-family: 'Oblique';
+            src: url('Oblique.ttf.woff2') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        #hooo-text {
+            position: absolute;
+            top: 35px;
+            left: 45px;
+            font-size: 2.5em;
+            color: white;
+            /* 你可以根据需要更改颜色 */
+            z-index: 1;
+            cursor: pointer;
+        }
+
+        #hooo-text::after {
+            content: '';
+            display: block;
+            width: 0;
+            height: 5px;
+            background-color: white;
+            transition: width 0.5s ease-in-out;
+            position: absolute;
+            left: 0;
+            bottom: -5px;
+        }
+
+        #hooo-text:hover::after {
+            width: 100%;
+        }
+
+
+        #nav {
+            display: none;
+            position: absolute;
+            top: 100px;
+            left: 45px;
+            z-index: 2;
+        }
+
+        #nav a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            font-size: 25px;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        #nav a:hover {
+            color: #f9edd9; /* 这里将颜色设置为金色，可以根据需要更改 */
+        }
+
+        #nav a:nth-child(1) {
+            transition-delay: 0s;
+        }
+
+        #nav a:nth-child(2) {
+            transition-delay: 0.3s;
+        }
+
+        #nav a:nth-child(3) {
+            transition-delay: 0.6s;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="hooo-text">Ho'oponopono</div>
+    <div id="nav">
+        <a href="#">Home</a>
+        <a href="https://hooponopono.org/" target="_blank">About</a>
+        <a href="mailto:ttqtc1@gmail.com">Contact Me</a>
+    </div>
+    <div id="love-text"></div>
+    <canvas id="gradient-canvas" data-transition-in />
+
+
+    <script type="module">
+        import { Gradient } from '/Gradient.js';
+
+        // Predefined color schemes
+        const colorSchemes = [
+            ['#c3e4ff', '#6ec3f4', '#eae2ff', '#b9beff'], // default
+            ['#845ec2', '#b39cd0', '#fbeaff', '#00c9a7'],
+            ['#845ec2', '#009efa', '#00d2fc', '#4ffbdf'],
+            ['#ffecd2', '#fcb69f', '#ff9a9e', '#fecfef'],
+            ['#F9D3BE', '#FFABAB', '#FFC3A0', '#D6A2E8'],
+            ['#A6B3FF', '#88D8B0', '#83E4EF', '#7C83D3'],
+            ['#ABDCFF', '#0396FF', '#ABDCFF', '#0396FF'],
+        ];
+
+        // Function to select a random color scheme
+        function getRandomColorScheme() {
+            const randomIndex = Math.floor(Math.random() * colorSchemes.length);
+            return colorSchemes[randomIndex];
+        }
+
+        // Function to initialize the gradient with a random color scheme
+        function initializeGradient() {
+            const gradientCanvas = document.getElementById('gradient-canvas');
+            const colors = getRandomColorScheme();
+
+            gradientCanvas.style.setProperty('--gradient-color-1', colors[0]);
+            gradientCanvas.style.setProperty('--gradient-color-2', colors[1]);
+            gradientCanvas.style.setProperty('--gradient-color-3', colors[2]);
+            gradientCanvas.style.setProperty('--gradient-color-4', colors[3]);
+
+            // Create your instance of Gradient and initialize it
+            const gradient = new Gradient();
+            gradient.initGradient('#gradient-canvas');
+        }
+
+        // Initialize gradient after DOM content is fully loaded
+        document.addEventListener('DOMContentLoaded', initializeGradient);
+
+        // Create your instance
+        //const gradient = new Gradient();
+
+        // Call `initGradient` with the selector to your canvas
+        //gradient.initGradient('#gradient-canvas');
+
+        // Text array with "I love you" in different languages
+        const loveTexts = {
+            "zh": "我爱你",  // Chinese
+            "en": "I love you",  // English
+            "fr": "Je t'aime",  // French
+            "es": "Te amo",  // Spanish
+            "de": "Ich liebe dich",  // German
+            "it": "Ti amo",  // Italian
+            "ru": "Я тебя люблю",  // Russian
+            "id": "Aku cinta kamu",  // Indonesian
+            "ko": "사랑해",  // Korean
+            "ja": "愛してる",  // Japanese
+            "ar": "أحبك",  // Arabic
+            "pt": "Eu te amo",  // Portuguese
+            "hi": "मैं तुमसे प्यार करता हूँ",  // Hindi
+            "bn": "আমি তোমাকে ভালবাসি",  // Bengali
+            "tr": "Seni seviyorum",  // Turkish
+            "vi": "Anh yêu em",  // Vietnamese
+            "pl": "Kocham cię",  // Polish
+            "nl": "Ik hou van jou",  // Dutch
+            "sv": "Jag älskar dig",  // Swedish
+            "no": "Jeg elsker deg",  // Norwegian
+            "fi": "Minä rakastan sinua",  // Finnish
+            "el": "Σ' αγαπώ",  // Greek
+            "th": "ฉันรักคุณ",  // Thai
+            "he": "אני אוהב אותך",  // Hebrew
+            "ro": "Te iubesc",  // Romanian
+            "hu": "Szeretlek",  // Hungarian
+            "cs": "Miluji tě",  // Czech
+            "sk": "Ľúbim ťa",  // Slovak
+            "da": "Jeg elsker dig",  // Danish
+            "fa": "دوستت دارم",  // Persian (Farsi)
+            "uk": "Я тебе кохаю",  // Ukrainian
+            "ms": "Saya cintakan awak",  // Malay
+            "tl": "Mahal kita",  // Filipino/Tagalog
+            "sw": "Nakupenda",  // Swahili
+            "sr": "Волим те",  // Serbian
+            "bg": "Обичам те",  // Bulgarian
+            "hr": "Volim te",  // Croatian
+        };
+
+        // Get the browser's default language
+        const userLang = navigator.language || navigator.userLanguage;
+        const langCode = userLang.split('-')[0]; // Get the language code (e.g., "en" from "en-US")
+
+        // Set the first text to the user's language
+        let textsToShow = [loveTexts[langCode] || "I love you"];  // Fallback to English if not found
+
+        // Get the rest of the texts
+        const otherTexts = Object.values(loveTexts).filter(text => text !== textsToShow[0]);
+
+        // Shuffle the other texts
+        otherTexts.sort(() => Math.random() - 0.5);
+
+        // Combine the arrays
+        textsToShow = textsToShow.concat(otherTexts);
+
+        let currentIndex = 0;
+        const loveTextElement = document.getElementById('love-text');
+
+        // Set the initial text immediately on page load
+        loveTextElement.textContent = textsToShow[currentIndex];
+
+        function changeText() {
+            loveTextElement.style.opacity = 0; // Fade out
+
+            setTimeout(() => {
+                currentIndex = (currentIndex + 1) % textsToShow.length;
+                loveTextElement.textContent = textsToShow[currentIndex];
+                loveTextElement.style.opacity = 1; // Fade in
+            }, 1500); // Match the transition duration
+        }
+
+        setInterval(changeText, 5000); // Adjust this timing to match fade-in/out
+
+        // Initial text fade-in
+        loveTextElement.style.opacity = 1;
+    </script>
+    <script>
+        const hoooText = document.getElementById('hooo-text');
+        const nav = document.getElementById('nav');
+        let isNavVisible = false;
+
+        hoooText.addEventListener('click', () => {
+            if (isNavVisible) {
+                nav.querySelectorAll('a').forEach(a => a.style.opacity = 0);
+                setTimeout(() => {
+                    nav.style.display = 'none';
+                }, 1500);
+            } else {
+                nav.style.display = 'block';
+                setTimeout(() => {
+                    nav.querySelectorAll('a').forEach(a => a.style.opacity = 1);
+                }, 50);
+            }
+            isNavVisible = !isNavVisible;
+        });
+    </script>
+</body>
+
+</html>
